@@ -15,7 +15,7 @@
     const FRAME_PATH    = 'frames/new_frame_';
     const LERP_FACTOR   = 0.25; // Snappy ultra-fast scroll reaction
     const SCROLL_LENGTH = '3800vh';
-    const RESIZE_WIDTH  = 720; // 720px lightweight high-speed texture size
+    const RESIZE_WIDTH  = 960; // Ultra-fast 60fps GPU texture size
 
     /* ── Render Queues & Cache ── */
     const bitmaps      = new Array(TOTAL_FRAMES);
@@ -143,14 +143,14 @@
     }
 
     function preloadSmartSequence() {
-        // Step 1: Immediately load first 3 frames for instant 0ms initial render (~35KB total payload)
-        for (let i = 0; i < 3; i++) {
+        // Step 1: Immediately load first 12 frames for instant 0ms initial render
+        for (let i = 0; i < 12; i++) {
             loadSingleFrame(i);
         }
 
-        // Step 2: Background idle batch preloader for remaining frames after window loads
-        let nextBatchStart = 3;
-        const BATCH_SIZE = 8;
+        // Step 2: Background idle batch preloader for remaining frames
+        let nextBatchStart = 12;
+        const BATCH_SIZE = 12;
 
         function loadNextBatch() {
             if (nextBatchStart >= TOTAL_FRAMES) return;
@@ -162,25 +162,17 @@
 
             if (nextBatchStart < TOTAL_FRAMES) {
                 if ('requestIdleCallback' in window) {
-                    requestIdleCallback(loadNextBatch, { timeout: 150 });
+                    requestIdleCallback(loadNextBatch, { timeout: 200 });
                 } else {
-                    setTimeout(loadNextBatch, 25);
+                    setTimeout(loadNextBatch, 30);
                 }
             }
         }
 
-        const startBackgroundLoad = () => {
-            if ('requestIdleCallback' in window) {
-                requestIdleCallback(loadNextBatch, { timeout: 200 });
-            } else {
-                setTimeout(loadNextBatch, 50);
-            }
-        };
-
-        if (document.readyState === 'complete') {
-            startBackgroundLoad();
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(loadNextBatch, { timeout: 300 });
         } else {
-            window.addEventListener('load', startBackgroundLoad, { once: true });
+            setTimeout(loadNextBatch, 100);
         }
     }
 
