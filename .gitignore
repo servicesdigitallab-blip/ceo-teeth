@@ -1,0 +1,10 @@
+# Scratch & Logs
+scratch/
+*.log
+.DS_Store
+
+# Raw heavy source videos (unneeded on web)
+0716 (1).mp4
+new scroll video aniamtion.mp4
+video_scroll.mp4
+fixed_bg_video.mp4

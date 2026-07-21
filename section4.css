@@ -1,0 +1,251 @@
+/* ══════════════════════════════════════════════════════
+   SECTION 4 – THE LUMEN DENTAL TEAM (EXACT MATCH)
+   ══════════════════════════════════════════════════════ */
+.lumen-team-section {
+    position: relative;
+    z-index: 10;
+    background: #06140f; /* Seamless transition from Section 3 */
+    padding: 60px 0 80px;
+    color: #ffffff;
+    user-select: none;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    perspective: 1200px; /* 3D Perspective Stage */
+}
+
+/* ── 16:9 Team Closeup Media Wrapper (3D GSAP Scroll & Chroma Spotlight) ── */
+.team-media {
+    position: relative;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    aspect-ratio: 16 / 9;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    --r: 350px;
+    --x: 50%;
+    --y: 50%;
+    --mouse-x: 50%;
+    --mouse-y: 50%;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    will-change: transform, clip-path, opacity, box-shadow;
+    /* Initial state — animated by GSAP ScrollTrigger */
+    transform: rotateX(14deg) rotateY(-3deg) scale(1.15);
+    clip-path: polygon(6% 0%, 94% 0%, 100% 100%, 0% 100%);
+    opacity: 0.2;
+}
+
+/* ── Chroma Grid Spotlight Overlay ── */
+.chroma-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background: radial-gradient(
+        var(--r, 350px) circle at var(--x, 50%) var(--y, 50%),
+        rgba(47, 214, 168, 0.45) 0%,
+        rgba(16, 185, 129, 0.2) 40%,
+        transparent 80%
+    );
+    mix-blend-mode: screen;
+    opacity: 0.85;
+    transition: opacity 0.3s ease;
+    z-index: 4;
+}
+
+.chroma-fade {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background: rgba(6, 20, 15, 0.2);
+    opacity: 1;
+    transition: opacity 0.6s ease;
+    z-index: 5;
+}
+
+.team-media::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: radial-gradient(
+        300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        #2fd6a8 0%,
+        #10b981 50%,
+        transparent 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 6;
+}
+
+.team-media:hover::before {
+    opacity: 1;
+}
+
+.team-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.team-media:hover img {
+    transform: scale(1.03);
+}
+
+.team-media-overlay-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 90px;
+    background: linear-gradient(to bottom, #06140f, transparent);
+    pointer-events: none;
+}
+
+.team-media-overlay-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 90px;
+    background: linear-gradient(to top, #06140f, transparent);
+    pointer-events: none;
+}
+
+/* ── Team Header Copy ── */
+.team-content {
+    max-width: 780px;
+    margin: 0 auto 60px;
+    padding: 0 28px;
+    text-align: center;
+}
+
+.team-eyebrow {
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #2fd6a8;
+    margin-bottom: 12px;
+    display: inline-block;
+}
+
+.team-heading {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(32px, 3.8vw, 52px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+    margin: 0 0 18px 0;
+    line-height: 1.15;
+}
+
+.team-subtext {
+    font-size: 16.5px;
+    color: rgba(255, 255, 255, 0.72);
+    font-weight: 400;
+    line-height: 1.6;
+    max-width: 62ch;
+    margin: 0 auto;
+}
+
+/* ── Trust / Credentials 4-Card Grid ── */
+.trust-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 28px;
+}
+
+.trust-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.trust-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 30px 24px;
+    backdrop-filter: blur(10px);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                background 0.35s ease,
+                border-color 0.35s ease,
+                box-shadow 0.35s ease;
+    cursor: pointer;
+}
+
+.trust-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(47, 214, 168, 0.4);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(47, 214, 168, 0.15);
+}
+
+.trust-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(47, 214, 168, 0.12);
+    color: #2fd6a8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.trust-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.trust-card:hover .trust-icon {
+    transform: scale(1.1) rotate(6deg);
+    background: rgba(47, 214, 168, 0.22);
+}
+
+.trust-card h4 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 10px 0;
+    letter-spacing: -0.01em;
+}
+
+.trust-card p {
+    font-size: 13.5px;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.55;
+    margin: 0;
+    font-weight: 400;
+}
+
+@media (max-width: 992px) {
+    .trust-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .trust-grid {
+        grid-template-columns: 1fr;
+    }
+    .team-media {
+        border-radius: 16px;
+    }
+}

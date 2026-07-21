@@ -1,0 +1,386 @@
+/* ══════════════════════════════════════════════════════
+   DEMO DENTIST – CHATBOT UI WIDGET STYLES (LIGHT MODE UI)
+   ══════════════════════════════════════════════════════ */
+
+/* ── Floating Chat Launcher Button (Bottom Right) ── */
+.fida-chat-toggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.45), 0 0 20px rgba(16, 185, 129, 0.3);
+    border: 2.5px solid #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999990;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
+    outline: none;
+}
+
+.fida-chat-toggle:hover {
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 14px 40px rgba(16, 185, 129, 0.6), 0 0 30px rgba(16, 185, 129, 0.4);
+}
+
+.fida-chat-toggle svg {
+    width: 28px;
+    height: 28px;
+    fill: none;
+    stroke: #ffffff;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.fida-chat-toggle .icon-close {
+    display: none;
+}
+
+.fida-chat-toggle.active .icon-chat {
+    display: none;
+}
+
+.fida-chat-toggle.active .icon-close {
+    display: block;
+}
+
+/* Online Pulse Badge */
+.fida-online-dot {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #10b981;
+    border: 2.5px solid #ffffff;
+    box-shadow: 0 0 8px #10b981;
+    animation: fidaPulse 2s infinite;
+}
+
+@keyframes fidaPulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* ── Chat Window Container (LIGHT MODE UI) ── */
+.fida-chat-box {
+    position: fixed;
+    bottom: 96px;
+    right: 24px;
+    width: 380px;
+    max-width: calc(100vw - 32px);
+    height: 580px;
+    max-height: calc(100vh - 120px);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.18), 0 0 45px rgba(16, 185, 129, 0.12);
+    display: flex;
+    flex-direction: column;
+    z-index: 999995;
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    pointer-events: none;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+}
+
+.fida-chat-box.active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+/* ── Chat Header ── */
+.fida-chat-header {
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.fida-chat-avatar {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    font-size: 20px;
+}
+
+.fida-chat-avatar .avatar-status {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #10b981;
+    border: 2px solid #ffffff;
+}
+
+.fida-chat-title h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.fida-chat-title p {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 2px 0 0;
+}
+
+/* ── Header Controls & Memory Toggle Switch (ICON ONLY) ── */
+.fida-header-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fida-memory-toggle-btn {
+    position: relative;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    outline: none;
+    padding: 0;
+}
+
+.fida-memory-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: scale(1.05);
+}
+
+.fida-memory-toggle-btn.memory-active {
+    background: #ffffff;
+    color: #059669;
+    border-color: #ffffff;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+.fida-memory-toggle-btn .memory-icon {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+}
+
+.fida-memory-toggle-btn .memory-dot {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    transition: background 0.25s ease;
+}
+
+.fida-memory-toggle-btn.memory-active .memory-dot {
+    background: #10b981;
+    box-shadow: 0 0 6px #10b981;
+}
+
+.fida-close-trigger {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: #ffffff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.fida-close-trigger svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    fill: none;
+    stroke-linecap: round;
+}
+
+.fida-close-trigger:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* ── Chat Messages Body ── */
+.fida-chat-body {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: #f8fafc;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+
+.fida-msg {
+    display: flex;
+    flex-direction: column;
+    max-width: 84%;
+    animation: fidaFadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fidaFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fida-msg.bot {
+    align-self: flex-start;
+}
+
+.fida-msg.user {
+    align-self: flex-end;
+}
+
+.fida-bubble {
+    padding: 12px 16px;
+    border-radius: 16px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.fida-msg.bot .fida-bubble {
+    background: #ffffff;
+    color: #1e293b;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border-bottom-left-radius: 4px;
+}
+
+.fida-msg.user .fida-bubble {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+}
+
+/* Typing Indicator */
+.fida-typing-dots {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 12px 18px;
+    background: #ffffff;
+    border-radius: 16px;
+    border-bottom-left-radius: 4px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    width: fit-content;
+}
+
+.fida-typing-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+    animation: fidaTyping 1.4s infinite ease-in-out both;
+}
+
+.fida-typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+.fida-typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes fidaTyping {
+    0%, 80%, 100% { transform: scale(0); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
+/* ── Chat Footer / Input Area ── */
+.fida-chat-footer {
+    padding: 14px 18px;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.fida-chat-input {
+    flex: 1;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 24px;
+    padding: 10px 18px;
+    color: #0f172a;
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fida-chat-input::placeholder {
+    color: #94a3b8;
+}
+
+.fida-chat-input:focus {
+    border-color: #10b981;
+    background: #ffffff;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+}
+
+.fida-chat-send {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.fida-chat-send svg {
+    width: 18px;
+    height: 18px;
+    stroke: #ffffff;
+    stroke-width: 2.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.fida-chat-send:hover {
+    transform: scale(1.05);
+}
