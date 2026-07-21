@@ -117,24 +117,62 @@
         return false;
     }
 
-    /* ── Asynchronous GPU Texture Preloader ── */
-    function preloadAndDecodeAll() {
-        for (let i = 0; i < TOTAL_FRAMES; i++) {
-            const img = new Image();
-            img.src = FRAME_PATH + String(i + 1).padStart(4, '0') + '.jpg';
-            fallbackImgs[i] = img;
-            
-            img.onload = () => {
-                startAnimation();
-                if (typeof createImageBitmap === 'function') {
-                    createImageBitmap(img, { resizeWidth: RESIZE_WIDTH, resizeQuality: 'high' })
-                        .then(bitmap => {
-                            bitmaps[i] = bitmap;
-                            startAnimation();
-                        })
-                        .catch(() => {});
+    /* ── High-Performance Progressive Frame Preloader ── */
+    const loadState = new Uint8Array(TOTAL_FRAMES); // 0: unstarted, 1: loading, 2: loaded
+
+    function loadSingleFrame(i) {
+        if (i < 0 || i >= TOTAL_FRAMES || loadState[i] > 0) return;
+        loadState[i] = 1;
+
+        const img = new Image();
+        img.src = FRAME_PATH + String(i + 1).padStart(4, '0') + '.jpg';
+        fallbackImgs[i] = img;
+
+        img.onload = () => {
+            loadState[i] = 2;
+            startAnimation();
+            if (typeof createImageBitmap === 'function') {
+                createImageBitmap(img, { resizeWidth: RESIZE_WIDTH, resizeQuality: 'medium' })
+                    .then(bitmap => {
+                        bitmaps[i] = bitmap;
+                        startAnimation();
+                    })
+                    .catch(() => {});
+            }
+        };
+    }
+
+    function preloadSmartSequence() {
+        // Step 1: Immediately load first 12 frames for instant 0ms initial render
+        for (let i = 0; i < 12; i++) {
+            loadSingleFrame(i);
+        }
+
+        // Step 2: Background idle batch preloader for remaining frames
+        let nextBatchStart = 12;
+        const BATCH_SIZE = 12;
+
+        function loadNextBatch() {
+            if (nextBatchStart >= TOTAL_FRAMES) return;
+            const end = Math.min(nextBatchStart + BATCH_SIZE, TOTAL_FRAMES);
+            for (let i = nextBatchStart; i < end; i++) {
+                loadSingleFrame(i);
+            }
+            nextBatchStart = end;
+
+            if (nextBatchStart < TOTAL_FRAMES) {
+                if ('requestIdleCallback' in window) {
+                    requestIdleCallback(loadNextBatch, { timeout: 200 });
+                } else {
+                    setTimeout(loadNextBatch, 30);
                 }
-            };
+            }
+        }
+
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(loadNextBatch, { timeout: 300 });
+        } else {
+            setTimeout(loadNextBatch, 100);
         }
     }
 
@@ -159,6 +197,13 @@
         if (top < cachedHeroHeight) {
             const progress = Math.min(Math.max(top / cachedMaxScroll, 0), 0.9999);
             targetFrame = progress * (TOTAL_FRAMES - 1);
+            
+            // Prioritize loading frames surrounding current scroll target
+            const centerIdx = Math.round(targetFrame);
+            for (let offset = -2; offset <= 5; offset++) {
+                loadSingleFrame(centerIdx + offset);
+            }
+
             startAnimation();
         }
     }
@@ -268,7 +313,7 @@
     /* ── Bootstrap ── */
     hero.style.height = SCROLL_LENGTH;
     resize();
-    preloadAndDecodeAll();
+    preloadSmartSequence();
     initSection2GSAP();
     initNavbarLogic();
 })();
