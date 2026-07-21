@@ -54,21 +54,9 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 12px 36px;
-    /* Nature Water Icy Glass Palette */
-    background: rgba(228, 247, 244, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(47, 214, 168, 0.35);
-    border-radius: 0 0 24px 24px; /* Attached flush to top: 0 top radius */
-    box-shadow: 0 8px 30px rgba(6, 30, 24, 0.08);
-    animation: navbarAmbientPulse 5s ease-in-out infinite alternate;
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-                max-width 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-                border-radius 0.6s ease,
-                box-shadow 0.6s ease,
-                background 0.6s ease,
-                border-color 0.6s ease;
-    will-change: transform, max-width, border-radius;
+    background: transparent;
+    border-bottom: none;
+    box-shadow: none;
 }
 
 @keyframes navbarAmbientPulse {
