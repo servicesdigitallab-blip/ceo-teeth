@@ -143,14 +143,14 @@
     }
 
     function preloadSmartSequence() {
-        // Step 1: Immediately load first 12 frames for instant 0ms initial render
-        for (let i = 0; i < 12; i++) {
+        // Step 1: Load first 6 frames immediately for 0ms initial render
+        for (let i = 0; i < 6; i++) {
             loadSingleFrame(i);
         }
 
-        // Step 2: Background idle batch preloader for remaining frames
-        let nextBatchStart = 12;
-        const BATCH_SIZE = 12;
+        // Step 2: Deferred background idle preloader for remaining frames
+        let nextBatchStart = 6;
+        const BATCH_SIZE = 6;
 
         function loadNextBatch() {
             if (nextBatchStart >= TOTAL_FRAMES) return;
@@ -162,17 +162,25 @@
 
             if (nextBatchStart < TOTAL_FRAMES) {
                 if ('requestIdleCallback' in window) {
-                    requestIdleCallback(loadNextBatch, { timeout: 200 });
+                    requestIdleCallback(loadNextBatch, { timeout: 1000 });
                 } else {
-                    setTimeout(loadNextBatch, 30);
+                    setTimeout(loadNextBatch, 150);
                 }
             }
         }
 
-        if ('requestIdleCallback' in window) {
-            requestIdleCallback(loadNextBatch, { timeout: 300 });
+        const startDeferredLoading = () => {
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(loadNextBatch, { timeout: 1500 });
+            } else {
+                setTimeout(loadNextBatch, 300);
+            }
+        };
+
+        if (document.readyState === 'complete') {
+            startDeferredLoading();
         } else {
-            setTimeout(loadNextBatch, 100);
+            window.addEventListener('load', startDeferredLoading, { once: true });
         }
     }
 
