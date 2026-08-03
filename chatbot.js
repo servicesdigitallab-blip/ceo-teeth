@@ -12,8 +12,8 @@
         // Backup OpenRouter API Key for 100% uptime reliability
         BACKUP_API_KEY: atob('c2stb3ItdjEtMjFlNzQ4OTljYTYwMmY4MzljMDZlYjIzZDA3YjhmOTkxNjU3ZWE5NDMxOThjNDkzYzYzYTVhYmFiM2E1NjMzOQ=='),
         
-        // Exact Working Gemini Model ID on OpenRouter
-        MODEL: 'google/gemini-2.5-flash-lite',
+        // Working Free Router Model on OpenRouter
+        MODEL: 'openrouter/free',
 
         // Google Apps Script Live Calendar Web App Endpoint
         GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwV1RdADrkMmuWA5DesWU14aC4osMz_S0-hO0XERJkr4N1t-EAcJB4BwszG0fawl2N3Gw/exec'
@@ -364,33 +364,51 @@ Once user confirms after check:
         }
     }
 
-    /* ── API CHAT COMPLETIONS CALLER WITH KEY FALLBACK ── */
+    /* ── API CHAT COMPLETIONS CALLER WITH KEY & MULTI-MODEL FALLBACK ── */
     async function fetchAIResponse(userMessages, apiKeyToUse) {
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${apiKeyToUse}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: CONFIG.MODEL,
-                messages: [
-                    { role: 'system', content: getSystemPrompt() },
-                    ...userMessages.slice(-6).map(m => ({
-                    role: m.role === 'assistant' ? 'assistant' : 'user',
-                    content: m.content
-                }))
-            ],
-            temperature: 0.3,
-            max_tokens: 100
-        })
-        });
+        const modelsToTry = [
+            CONFIG.MODEL,
+            'google/gemma-4-26b-a4b-it:free',
+            'google/gemma-4-31b-it:free',
+            'openai/gpt-oss-20b:free',
+            'nvidia/nemotron-3-nano-30b-a3b:free'
+        ];
 
-        if (!response.ok) {
-            throw new Error(`OpenRouter HTTP ${response.status}`);
+        let lastErr = null;
+        for (const model of modelsToTry) {
+            try {
+                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKeyToUse}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: [
+                            { role: 'system', content: getSystemPrompt() },
+                            ...userMessages.slice(-6).map(m => ({
+                                role: m.role === 'assistant' ? 'assistant' : 'user',
+                                content: m.content
+                            }))
+                        ],
+                        temperature: 0.3,
+                        max_tokens: 150
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.choices && data.choices[0] && data.choices[0].message) {
+                        return data;
+                    }
+                }
+            } catch (err) {
+                lastErr = err;
+            }
         }
 
-        return await response.json();
+        throw lastErr || new Error('All free model endpoints returned errors');
     }
 
     /* ── MAIN CHAT & IN-PLACE APPOINTMENT PROCESSOR ── */
