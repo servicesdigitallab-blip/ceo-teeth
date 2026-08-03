@@ -84,8 +84,8 @@ Once user confirms after check:
     };
 
     /* ── MEMORY STORAGE & TOGGLE (DEFAULT: OFF = FRESH CHAT ON RELOAD) ── */
-    const MEMORY_DATA_KEY = 'fida_chat_memory_v2';
-    const MEMORY_TOGGLE_KEY = 'fida_memory_on_v2';
+    const MEMORY_DATA_KEY = 'fida_chat_memory_v3';
+    const MEMORY_TOGGLE_KEY = 'fida_memory_on_v3';
 
     function isMemoryEnabled() {
         return localStorage.getItem(MEMORY_TOGGLE_KEY) === '1';
