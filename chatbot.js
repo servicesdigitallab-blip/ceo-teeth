@@ -68,24 +68,23 @@ STATE 1: CASUAL CONVERSATION & Q&A
 - If user says hi/hello/hey, greet them warmly and ask how you can help. Do NOT ask for booking details yet.
 - If asked about location or phone, provide details directly.
 
-STATE 2: BOOKING FLOW (Triggers ONLY when user explicitly asks to book/schedule)
-Collect details ONE BY ONE:
-1. Full Name
-2. First time visiting?
-3. Phone number (Save exact raw digits, no +1 added!)
-4. Email address (If omitted, set "Not provided")
-5. Service needed
-6. Date & Time
+STATE 2: BOOKING FLOW (Triggers ONLY when user explicitly asks to book or schedule an appointment)
+Collect details ONE BY ONE in this EXACT ORDER:
+1. Full Name & Dental Service Needed (Ask: "What is your full name and which dental service would you like to book?")
+2. Email Address (Ask: "What is your email address?")
+3. Phone Number (Ask: "What is your phone number?")
+4. Preferred Date & Time Slot (Ask: "Which date and time slot do you prefer for your appointment?")
 
-Once collected, output check block:
+Once collected, output calendar availability check block:
 ###CHECK###{"name":"[Name]","phone":"[Phone]","email":"[Email]","service":"[Service]","date":"YYYY-MM-DD","time":"HH:MM AM/PM"}###END###
-Once user confirms after check:
+
+Once slot is confirmed available and user confirms:
 ###BOOKING###{"name":"[Name]","phone":"[Phone]","email":"[Email]","service":"[Service]","date":"YYYY-MM-DD","time":"HH:MM AM/PM"}###END###`;
     };
 
     /* ── MEMORY STORAGE & TOGGLE (DEFAULT: OFF = FRESH CHAT ON RELOAD) ── */
-    const MEMORY_DATA_KEY = 'fida_chat_memory_v3';
-    const MEMORY_TOGGLE_KEY = 'fida_memory_on_v3';
+    const MEMORY_DATA_KEY = 'demo_dentist_chat_memory_v4';
+    const MEMORY_TOGGLE_KEY = 'demo_dentist_memory_on_v4';
 
     function isMemoryEnabled() {
         return localStorage.getItem(MEMORY_TOGGLE_KEY) === '1';
@@ -131,11 +130,11 @@ Once user confirms after check:
     function injectChatbotDOM() {
         // Floating Toggle Button
         const btn = document.createElement('button');
-        btn.className = 'fida-chat-toggle';
-        btn.id = 'fida-chat-btn';
+        btn.className = 'dd-chat-toggle';
+        btn.id = 'dd-chat-btn';
         btn.ariaLabel = 'Chat with DEMO DENTIST Receptionist';
         btn.innerHTML = `
-            <div class="fida-online-dot"></div>
+            <div class="dd-online-dot"></div>
             <svg viewBox="0 0 24 24" class="icon-chat">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
@@ -147,27 +146,27 @@ Once user confirms after check:
 
         // Chat Container Box (LIGHT MODE UI WITH ICON-ONLY MEMORY TOGGLE)
         const box = document.createElement('div');
-        box.className = 'fida-chat-box light-mode';
-        box.id = 'fida-chat-window';
+        box.className = 'dd-chat-box light-mode';
+        box.id = 'dd-chat-window';
         box.innerHTML = `
-            <div class="fida-chat-header">
-                <div class="fida-chat-avatar">
+            <div class="dd-chat-header">
+                <div class="dd-chat-avatar">
                     <span class="avatar-icon">🦷</span>
                     <span class="avatar-status"></span>
                 </div>
-                <div class="fida-chat-title">
+                <div class="dd-chat-title">
                     <h4>DEMO DENTIST <span class="sparkle">✨</span></h4>
                     <p>Receptionist • Dental Clinic</p>
                 </div>
-                <div class="fida-header-controls">
-                    <button class="fida-memory-toggle-btn ${state.isMemoryOn ? 'memory-active' : ''}" id="fida-memory-btn" aria-label="Toggle Memory Mode" title="${state.isMemoryOn ? 'Memory Mode: ON' : 'Memory Mode: OFF'}">
+                <div class="dd-header-controls">
+                    <button class="dd-memory-toggle-btn ${state.isMemoryOn ? 'memory-active' : ''}" id="dd-memory-btn" aria-label="Toggle Memory Mode" title="${state.isMemoryOn ? 'Memory Mode: ON' : 'Memory Mode: OFF'}">
                         <svg viewBox="0 0 24 24" class="memory-icon">
                             <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"></path>
                             <circle cx="12" cy="12" r="3.5"></circle>
                         </svg>
                         <span class="memory-dot"></span>
                     </button>
-                    <button class="fida-close-trigger" id="fida-close-btn" aria-label="Close Chat">
+                    <button class="dd-close-trigger" id="dd-close-btn" aria-label="Close Chat">
                         <svg viewBox="0 0 24 24">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
                             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -176,13 +175,13 @@ Once user confirms after check:
                 </div>
             </div>
             
-            <div class="fida-chat-body" id="fida-chat-body">
+            <div class="dd-chat-body" id="dd-chat-body">
                 <!-- Render conversation history -->
             </div>
 
-            <div class="fida-chat-footer">
-                <input type="text" class="fida-chat-input" id="fida-chat-input" placeholder="Ask DEMO DENTIST anything..." autocomplete="off" />
-                <button class="fida-chat-send" id="fida-chat-send-btn" aria-label="Send">
+            <div class="dd-chat-footer">
+                <input type="text" class="dd-chat-input" id="dd-chat-input" placeholder="Ask DEMO DENTIST anything..." autocomplete="off" />
+                <button class="dd-chat-send" id="dd-chat-send-btn" aria-label="Send">
                     <svg viewBox="0 0 24 24">
                         <line x1="22" y1="2" x2="11" y2="13"></line>
                         <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
@@ -198,11 +197,11 @@ Once user confirms after check:
 
         // Event Bindings
         btn.addEventListener('click', toggleChat);
-        document.getElementById('fida-close-btn').addEventListener('click', toggleChat);
-        document.getElementById('fida-memory-btn').addEventListener('click', handleMemoryToggle);
+        document.getElementById('dd-close-btn').addEventListener('click', toggleChat);
+        document.getElementById('dd-memory-btn').addEventListener('click', handleMemoryToggle);
 
-        const inputEl = document.getElementById('fida-chat-input');
-        const sendBtn = document.getElementById('fida-chat-send-btn');
+        const inputEl = document.getElementById('dd-chat-input');
+        const sendBtn = document.getElementById('dd-chat-send-btn');
 
         sendBtn.addEventListener('click', handleSend);
         inputEl.addEventListener('keypress', (e) => {
@@ -212,7 +211,7 @@ Once user confirms after check:
 
     function handleMemoryToggle() {
         state.isMemoryOn = !state.isMemoryOn;
-        const memoryBtn = document.getElementById('fida-memory-btn');
+        const memoryBtn = document.getElementById('dd-memory-btn');
 
         if (state.isMemoryOn) {
             localStorage.setItem(MEMORY_TOGGLE_KEY, '1');
@@ -229,12 +228,12 @@ Once user confirms after check:
 
     function toggleChat() {
         state.isOpen = !state.isOpen;
-        const box = document.getElementById('fida-chat-window');
-        const btn = document.getElementById('fida-chat-btn');
+        const box = document.getElementById('dd-chat-window');
+        const btn = document.getElementById('dd-chat-btn');
         if (state.isOpen) {
             box.classList.add('active');
             btn.classList.add('active');
-            setTimeout(() => document.getElementById('fida-chat-input').focus(), 200);
+            setTimeout(() => document.getElementById('dd-chat-input').focus(), 200);
         } else {
             box.classList.remove('active');
             btn.classList.remove('active');
@@ -246,8 +245,8 @@ Once user confirms after check:
         if (!state.isOpen) {
             toggleChat();
         }
-        const inputEl = document.getElementById('fida-chat-input');
-        const sendBtn = document.getElementById('fida-chat-send-btn');
+        const inputEl = document.getElementById('dd-chat-input');
+        const sendBtn = document.getElementById('dd-chat-send-btn');
         if (inputEl) {
             inputEl.value = messageText;
             setTimeout(() => {
@@ -259,14 +258,14 @@ Once user confirms after check:
     };
 
     function renderMessages() {
-        const body = document.getElementById('fida-chat-body');
+        const body = document.getElementById('dd-chat-body');
         if (!body) return;
 
         body.innerHTML = '';
         state.messages.forEach(msg => {
             if (!msg.content) return;
             const div = document.createElement('div');
-            div.className = `fida-msg ${msg.role === 'user' ? 'user' : 'bot'}`;
+            div.className = `dd-msg ${msg.role === 'user' ? 'user' : 'bot'}`;
             
             // Clean any hidden JSON or trigger blocks before rendering
             let cleanText = msg.content
@@ -276,7 +275,7 @@ Once user confirms after check:
                 .trim();
 
             if (cleanText) {
-                div.innerHTML = `<div class="fida-bubble">${escapeHTML(cleanText)}</div>`;
+                div.innerHTML = `<div class="dd-bubble">${escapeHTML(cleanText)}</div>`;
                 body.appendChild(div);
             }
         });
@@ -285,13 +284,13 @@ Once user confirms after check:
     }
 
     function showTyping() {
-        const body = document.getElementById('fida-chat-body');
+        const body = document.getElementById('dd-chat-body');
         if (!body) return;
         const typingDiv = document.createElement('div');
-        typingDiv.className = 'fida-msg bot';
-        typingDiv.id = 'fida-typing';
+        typingDiv.className = 'dd-msg bot';
+        typingDiv.id = 'dd-typing';
         typingDiv.innerHTML = `
-            <div class="fida-typing-dots">
+            <div class="dd-typing-dots">
                 <span></span><span></span><span></span>
             </div>
         `;
@@ -300,7 +299,7 @@ Once user confirms after check:
     }
 
     function hideTyping() {
-        const el = document.getElementById('fida-typing');
+        const el = document.getElementById('dd-typing');
         if (el) el.remove();
     }
 
@@ -415,7 +414,7 @@ Once user confirms after check:
     async function handleSend() {
         if (state.isThinking) return;
 
-        const inputEl = document.getElementById('fida-chat-input');
+        const inputEl = document.getElementById('dd-chat-input');
         const text = inputEl.value.trim();
         if (!text) return;
 
