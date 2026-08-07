@@ -207,8 +207,11 @@ Once slot is confirmed available and user confirms:
         const sendBtn = document.getElementById('dd-chat-send-btn');
 
         sendBtn.addEventListener('click', handleSend);
-        inputEl.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleSend();
+        inputEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+            }
         });
     }
 
@@ -408,6 +411,9 @@ Once slot is confirmed available and user confirms:
 
         let lastErr = null;
         for (const model of modelsToTry) {
+            const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 6000) : null;
+
             try {
                 const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                     method: 'POST',
@@ -426,8 +432,11 @@ Once slot is confirmed available and user confirms:
                         ],
                         temperature: 0.3,
                         max_tokens: 150
-                    })
+                    }),
+                    signal: controller ? controller.signal : undefined
                 });
+
+                if (timeoutId) clearTimeout(timeoutId);
 
                 if (response.ok) {
                     const data = await response.json();
@@ -436,6 +445,7 @@ Once slot is confirmed available and user confirms:
                     }
                 }
             } catch (err) {
+                if (timeoutId) clearTimeout(timeoutId);
                 lastErr = err;
             }
         }
@@ -448,6 +458,9 @@ Once slot is confirmed available and user confirms:
         if (state.isThinking) return;
 
         const inputEl = document.getElementById('dd-chat-input');
+        const sendBtn = document.getElementById('dd-chat-send-btn');
+        if (!inputEl) return;
+
         const text = inputEl.value.trim();
         if (!text) return;
 
@@ -457,6 +470,8 @@ Once slot is confirmed available and user confirms:
         renderMessages();
 
         state.isThinking = true;
+        inputEl.disabled = true;
+        if (sendBtn) sendBtn.disabled = true;
         showTyping();
 
         try {
@@ -469,9 +484,6 @@ Once slot is confirmed available and user confirms:
                 // Fallback to Backup Key
                 data = await fetchAIResponse(state.messages, CONFIG.BACKUP_API_KEY);
             }
-
-            hideTyping();
-            state.isThinking = false;
 
             if (data && data.choices && data.choices[0] && data.choices[0].message) {
                 let botReply = cleanBotReply(data.choices[0].message.content || '');
@@ -509,12 +521,8 @@ Once slot is confirmed available and user confirms:
                         renderMessages();
 
                         showTyping();
-                        state.isThinking = true;
 
                         const gasResult = await postToGoogleAppsScript({ action: 'check', clinic: 'DEMO DENTIST', location: '5th Avenue, Suite 800, New York, NY 10001, USA', date: checkData.date, time: checkData.time });
-                        
-                        hideTyping();
-                        state.isThinking = false;
 
                         // UPDATE SAME BUBBLE IN-PLACE (ZERO EXTRA BUBBLES!)
                         if (gasResult && gasResult.success && gasResult.available !== false) {
@@ -542,7 +550,6 @@ Once slot is confirmed available and user confirms:
                         const bookingData = JSON.parse(jsonStr);
 
                         showTyping();
-                        state.isThinking = true;
 
                         const gasResult = await postToGoogleAppsScript({ 
                             action: 'book', 
@@ -551,9 +558,6 @@ Once slot is confirmed available and user confirms:
                             bookedVia: 'DEMO DENTIST CHATBOT', 
                             ...bookingData 
                         });
-
-                        hideTyping();
-                        state.isThinking = false;
 
                         // UPDATE SAME BUBBLE IN-PLACE (ZERO EXTRA BUBBLES!)
                         if (gasResult && gasResult.success) {
@@ -577,12 +581,16 @@ Once slot is confirmed available and user confirms:
             }
 
         } catch (err) {
-            hideTyping();
-            state.isThinking = false;
             console.error('Chatbot Processing Error:', err);
             state.messages.push({ role: 'assistant', content: "I am so sorry, I ran into a brief connection glitch. Could you kindly try again in a moment, please?" });
             saveMemory(state.messages);
             renderMessages();
+        } finally {
+            hideTyping();
+            state.isThinking = false;
+            if (inputEl) inputEl.disabled = false;
+            if (sendBtn) sendBtn.disabled = false;
+            if (inputEl) inputEl.focus();
         }
     }
 
