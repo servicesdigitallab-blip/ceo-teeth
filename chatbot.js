@@ -402,9 +402,9 @@ Once slot is confirmed available and user confirms:
     /* ── API CHAT COMPLETIONS CALLER WITH KEY & MULTI-MODEL FALLBACK ── */
     async function fetchAIResponse(userMessages, apiKeyToUse) {
         const modelsToTry = [
-            CONFIG.MODEL,
             'google/gemma-4-26b-a4b-it:free',
             'google/gemma-4-31b-it:free',
+            CONFIG.MODEL,
             'openai/gpt-oss-20b:free',
             'nvidia/nemotron-3-nano-30b-a3b:free'
         ];
@@ -412,7 +412,7 @@ Once slot is confirmed available and user confirms:
         let lastErr = null;
         for (const model of modelsToTry) {
             const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = controller ? setTimeout(() => controller.abort(), 6000) : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 3500) : null;
 
             try {
                 const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -430,8 +430,8 @@ Once slot is confirmed available and user confirms:
                                 content: m.content
                             }))
                         ],
-                        temperature: 0.3,
-                        max_tokens: 150
+                        temperature: 0.2,
+                        max_tokens: 120
                     }),
                     signal: controller ? controller.signal : undefined
                 });
@@ -470,7 +470,6 @@ Once slot is confirmed available and user confirms:
         renderMessages();
 
         state.isThinking = true;
-        inputEl.disabled = true;
         if (sendBtn) sendBtn.disabled = true;
         showTyping();
 
@@ -588,7 +587,6 @@ Once slot is confirmed available and user confirms:
         } finally {
             hideTyping();
             state.isThinking = false;
-            if (inputEl) inputEl.disabled = false;
             if (sendBtn) sendBtn.disabled = false;
             if (inputEl) inputEl.focus();
         }
