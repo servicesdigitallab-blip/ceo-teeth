@@ -314,18 +314,25 @@ Once slot is confirmed available and user confirms:
 
     function cleanBotReply(str) {
         if (!str) return '';
-        str = str.replace(/<think>[\s\S]*?<\/think>/gi, '').replace(/<reasoning>[\s\S]*?<\/reasoning>/gi, '').trim();
 
-        if (str.includes('###CHECK###') || str.includes('###BOOKING###')) {
-            return str;
+        // Extract ###CHECK### or ###BOOKING### block if present anywhere in output
+        const checkMatch = str.match(/(###CHECK###[\s\S]*?(?:###END###|$))/);
+        if (checkMatch && checkMatch[1]) {
+            return checkMatch[1].trim();
         }
+
+        const bookMatch = str.match(/(###BOOKING###[\s\S]*?(?:###END###|$))/);
+        if (bookMatch && bookMatch[1]) {
+            return bookMatch[1].trim();
+        }
+
+        str = str.replace(/<think>[\s\S]*?<\/think>/gi, '').replace(/<reasoning>[\s\S]*?<\/reasoning>/gi, '').trim();
 
         if (str.includes('\n')) {
             const lines = str.split('\n').map(l => l.trim()).filter(Boolean);
             str = lines[lines.length - 1];
         }
 
-        // Clean any leading transition word without trimming questions mid-way
         str = str.replace(/^Now,?\s+/i, '').trim();
 
         if (str.length > 0) {
@@ -412,7 +419,7 @@ Once slot is confirmed available and user confirms:
                         model: model,
                         messages: [
                             { role: 'system', content: getSystemPrompt() },
-                            ...userMessages.slice(-6).map(m => ({
+                            ...userMessages.slice(-24).map(m => ({
                                 role: m.role === 'assistant' ? 'assistant' : 'user',
                                 content: m.content
                             }))
