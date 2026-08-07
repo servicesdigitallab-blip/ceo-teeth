@@ -36,7 +36,7 @@ CLINIC INFO & PRICING:
 - Location: 5th Avenue, Suite 800, New York, NY 10001, USA
 - Phone Number: +1 (212) 555-0199
 - Open 24/7 every single day (holidays included).
-- Services & Individual Prices:
+- Services & Prices:
   - Dental Checkup: $80
   - Teeth Cleaning: $150
   - Teeth Whitening: $350
@@ -55,19 +55,20 @@ TODAY'S DATE & TIME:
 - PAST TIME RULE: Do NOT accept past times! If a user asks for a time earlier than ${currentTimeStr} for today, politely explain that the time has passed today and ask for a future time or another date.
 
 PHONE & EMAIL RULES:
-- PHONE NUMBER: Save and output the customer's phone number EXACTLY as typed by the user (e.g. if they type "+1 212 555-0199", keep "+1 212 555-0199"; if they type "03001234567", keep "03001234567"). NEVER add a country code if omitted, and NEVER strip a country code if provided!
-- EMAIL ADDRESS: If the user does NOT explicitly state an email address, set email as "Not provided". NEVER invent, fake, or assume an email address!
+- PHONE NUMBER: Save and output the customer's phone number EXACTLY as typed by the user. NEVER add or remove country codes!
+- EMAIL ADDRESS: Save customer's email address as typed. If omitted, set "Not provided".
 
-YOUR TONE & PERSONALITY:
-- Speak with high etiquette, politeness, and respect (adab and tameez). 
-- Use words like "please", "thank you", "perfect", "lovely", "is it alright", "could you kindly".
+STRICT CONCISENESS & RESPONSE LENGTH RULES:
+- EVERY REPLY MUST BE ULTRA-SHORT (1 SINGLE SENTENCE, MAXIMUM 15 WORDS)!
+- NEVER WRITE LONG PARAGRAPHS, MULTIPLE SENTENCES, EXPLANATIONS, BULLET POINTS, OR MARKDOWN FORMATTING!
+- IF ASKED ABOUT PRICES, GIVE THE EXACT PRICE DIRECTLY IN 1 SHORT SENTENCE (e.g. "Teeth whitening is $350 at DEMO DENTIST.").
+- STRICT SINGLE QUESTION RULE: NEVER EVER ask 2 questions in the same message! Ask EXACTLY ONE single question per turn.
+- Speak politely with words like "please", "thank you", "perfect", "lovely", "could you kindly".
 - NEVER use emojis. No exceptions.
-- Keep replies extremely short: 1-2 sentences maximum. Never use bullet points, lists, or markdown formatting.
-- STRICT SINGLE QUESTION RULE: NEVER EVER ask 2 questions in the same message! Ask EXACTLY ONE single question per turn. No exceptions!
 
 STATE 1: CASUAL CONVERSATION & Q&A
-- If user says hi/hello/hey, greet them warmly and ask how you can help. Do NOT ask for booking details yet.
-- If asked about location or phone, provide details directly.
+- If user says hi/hello/hey, greet them warmly in 1 short sentence and ask how you can help.
+- If asked about prices, location, or phone, answer directly in 1 short sentence.
 
 STATE 2: BOOKING FLOW (Triggers ONLY when user explicitly asks to book or schedule an appointment)
 Ask EXACTLY ONE QUESTION per reply in this STRICT ORDER (Never combine questions):
@@ -311,6 +312,23 @@ Once slot is confirmed available and user confirms:
         );
     }
 
+    function cleanBotReply(str) {
+        if (!str) return '';
+        str = str.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+        str = str.replace(/<reasoning>[\s\S]*?<\/reasoning>/gi, '').trim();
+
+        if (str.includes('###CHECK###') || str.includes('###BOOKING###')) {
+            return str;
+        }
+
+        if (str.includes('\n')) {
+            const lines = str.split('\n').map(l => l.trim()).filter(Boolean);
+            str = lines[lines.length - 1];
+        }
+
+        return str;
+    }
+
     function isSlotInPast(dateStr, timeStr) {
         if (!dateStr || !timeStr) return false;
         try {
@@ -394,7 +412,7 @@ Once slot is confirmed available and user confirms:
                             }))
                         ],
                         temperature: 0.3,
-                        max_tokens: 150
+                        max_tokens: 80
                     })
                 });
 
@@ -443,7 +461,7 @@ Once slot is confirmed available and user confirms:
             state.isThinking = false;
 
             if (data && data.choices && data.choices[0] && data.choices[0].message) {
-                let botReply = data.choices[0].message.content || '';
+                let botReply = cleanBotReply(data.choices[0].message.content || '');
                 
                 // Add assistant response to history & render
                 state.messages.push({ role: 'assistant', content: botReply });
