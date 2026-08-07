@@ -412,7 +412,7 @@ Once slot is confirmed available and user confirms:
         let lastErr = null;
         for (const model of modelsToTry) {
             const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = controller ? setTimeout(() => controller.abort(), 3500) : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 2500) : null;
 
             try {
                 const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -431,7 +431,7 @@ Once slot is confirmed available and user confirms:
                             }))
                         ],
                         temperature: 0.2,
-                        max_tokens: 120
+                        max_tokens: 100
                     }),
                     signal: controller ? controller.signal : undefined
                 });
@@ -470,7 +470,10 @@ Once slot is confirmed available and user confirms:
         renderMessages();
 
         state.isThinking = true;
-        if (sendBtn) sendBtn.disabled = true;
+        if (sendBtn) {
+            sendBtn.disabled = true;
+            sendBtn.classList.add('disabled');
+        }
         showTyping();
 
         try {
@@ -587,7 +590,10 @@ Once slot is confirmed available and user confirms:
         } finally {
             hideTyping();
             state.isThinking = false;
-            if (sendBtn) sendBtn.disabled = false;
+            if (sendBtn) {
+                sendBtn.disabled = false;
+                sendBtn.classList.remove('disabled');
+            }
             if (inputEl) inputEl.focus();
         }
     }

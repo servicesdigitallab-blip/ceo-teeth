@@ -384,3 +384,19 @@
 .dd-chat-send:hover {
     transform: scale(1.05);
 }
+
+.dd-chat-send:disabled,
+.dd-chat-send.disabled {
+    background: #cbd5e1 !important;
+    color: #94a3b8 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+    opacity: 0.6 !important;
+    pointer-events: none !important;
+}
+
+.dd-chat-send:disabled svg,
+.dd-chat-send.disabled svg {
+    stroke: #94a3b8 !important;
+}
