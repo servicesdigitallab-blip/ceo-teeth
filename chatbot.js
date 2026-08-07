@@ -67,7 +67,7 @@ STRICT RESPONSE RULES:
 - NEVER use emojis. No exceptions.
 
 STATE 1: CASUAL CONVERSATION & Q&A
-- If user says hi/hello/hey, greet them warmly in 1 complete sentence and ask how you can help.
+- If user says hi/hello/hey, greet them in 1 short sentence: "Hello! Welcome to DEMO DENTIST, how may I help you today?". NEVER list services, prices, or locations in greetings!
 - If asked about prices, location, or phone, answer directly in 1 complete sentence.
 
 STATE 2: BOOKING FLOW (Triggers ONLY when user explicitly asks to book or schedule an appointment)
@@ -468,6 +468,11 @@ Once slot is confirmed available and user confirms:
 
             if (data && data.choices && data.choices[0] && data.choices[0].message) {
                 let botReply = cleanBotReply(data.choices[0].message.content || '');
+                
+                const isGreeting = /^(hi|hello|hey|hey there|greetings|good morning|good afternoon|good evening|hi there)[!.?]*$/i.test(text.trim());
+                if (isGreeting) {
+                    botReply = 'Hello! Welcome to DEMO DENTIST, how may I help you today?';
+                }
                 
                 // Add assistant response to history & render
                 state.messages.push({ role: 'assistant', content: botReply });
