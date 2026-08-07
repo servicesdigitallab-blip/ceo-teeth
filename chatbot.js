@@ -58,20 +58,20 @@ PHONE & EMAIL RULES:
 - PHONE NUMBER: Save and output the customer's phone number EXACTLY as typed by the user. NEVER add or remove country codes!
 - EMAIL ADDRESS: Save customer's email address as typed. If omitted, set "Not provided".
 
-STRICT CONCISENESS & RESPONSE RULES:
-- EVERY REPLY MUST BE ULTRA-SHORT (1 SINGLE SHORT SENTENCE, MAXIMUM 10-12 WORDS)!
-- STRICT NO-RECAP RULE: NEVER RECAP OR SUMMARIZE PREVIOUSLY COLLECTED DETAILS (e.g. NEVER SAY "Thank you for providing your email", "You have provided X", or "Now that I have your info"). DO NOT WRITE RECAP SENTENCES!
-- STRICT SINGLE QUESTION RULE: NEVER EVER ask 2 questions in the same message! Ask EXACTLY ONE single question per turn.
-- IF ASKED ABOUT PRICES, GIVE THE EXACT PRICE DIRECTLY IN 1 SHORT SENTENCE (e.g. "Teeth whitening is $350 at DEMO DENTIST.").
+STRICT RESPONSE RULES:
+- EVERY REPLY MUST BE ONE COMPLETE, POLITE SINGLE SENTENCE! Never truncate or leave sentences incomplete.
+- STRICT SINGLE QUESTION RULE: NEVER ask 2 questions in the same message! Ask EXACTLY ONE complete single question per turn.
+- STRICT NO-RECAP RULE: NEVER recap or repeat previously collected details (e.g. NEVER say "Thank you for providing your email", "You have provided X", or "Now that I have your info").
+- IF ASKED ABOUT PRICES, GIVE THE EXACT PRICE DIRECTLY IN ONE COMPLETE SENTENCE (e.g. "Teeth whitening is $350 at DEMO DENTIST.").
 - Speak politely with words like "please", "thank you", "perfect", "lovely", "could you kindly".
 - NEVER use emojis. No exceptions.
 
 STATE 1: CASUAL CONVERSATION & Q&A
-- If user says hi/hello/hey, greet them warmly in 1 short sentence and ask how you can help.
-- If asked about prices, location, or phone, answer directly in 1 short sentence.
+- If user says hi/hello/hey, greet them warmly in 1 complete sentence and ask how you can help.
+- If asked about prices, location, or phone, answer directly in 1 complete sentence.
 
 STATE 2: BOOKING FLOW (Triggers ONLY when user explicitly asks to book or schedule an appointment)
-Ask EXACTLY ONE QUESTION per reply in this STRICT ORDER (Never combine or recap):
+Ask EXACTLY ONE COMPLETE QUESTION per reply in this STRICT ORDER (Never combine or recap):
 1. Ask ONLY for Full Name (e.g. "May I please have your full name?")
 2. Ask ONLY for Dental Service Needed (e.g. "Which dental service would you like to book?")
 3. Ask ONLY for Email Address (e.g. "What is your email address?")
@@ -325,8 +325,8 @@ Once slot is confirmed available and user confirms:
             str = lines[lines.length - 1];
         }
 
-        // Strip any AI recap / transition clauses (e.g. "Thank you for providing...", "You have provided...", etc.)
-        str = str.replace(/^(Thank you for providing [^.!?]+[.!?]\s*|You have provided [^.!?]+[.!?]\s*|Great, [^.!?]+[.!?]\s*|Now that [^.!?]+[.!?]\s*|Now,?\s*)/i, '').trim();
+        // Clean any leading transition word without trimming questions mid-way
+        str = str.replace(/^Now,?\s+/i, '').trim();
 
         if (str.length > 0) {
             str = str.charAt(0).toUpperCase() + str.slice(1);
@@ -418,7 +418,7 @@ Once slot is confirmed available and user confirms:
                             }))
                         ],
                         temperature: 0.3,
-                        max_tokens: 80
+                        max_tokens: 150
                     })
                 });
 
